@@ -7,18 +7,12 @@ Event OnInit()
 	UnregisterForAllKeys()
 	RegisterForKey(DropKey)
 	RecentItems = new Form[3]
-	RecentItems[0] = None
-	RecentItems[1] = None
-	RecentItems[2] = None
 EndEvent
 
 Event OnPlayerLoadGame()
 	UnregisterForAllKeys()
 	RegisterForKey(DropKey)
 	RecentItems = new Form[3]
-	RecentItems[0] = None
-	RecentItems[1] = None
-	RecentItems[2] = None
 EndEvent
 
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
@@ -29,6 +23,7 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
 	RecentItems[2] = RecentItems[1]
 	RecentItems[1] = RecentItems[0]
 	RecentItems[0] = akBaseItem
+
 	Debug.Notification("0: " + RecentItems[0].GetName() + " | " + "1: " + RecentItems[1].GetName() + " | " + "2: " + RecentItems[2].GetName())
 EndEvent
 
@@ -39,11 +34,11 @@ Event OnKeyDown(Int KeyCode)
 			Return
 		EndIf
 
-		RecentItems[0]
-			Game.GetPlayer().DropObject(RecentItems[0], 1)
-			RecentItems[0] = RecentItems[1]
-			RecentItems[1] = RecentItems[2]
-			RecentItems[2] = None
-			Debug.Notification("0: " + RecentItems[0].GetName() + " | " + "1: " + RecentItems[1].GetName() + " | " + "2: " + RecentItems[2].GetName())
+		Game.GetPlayer().DropObject(RecentItems[0], 1)
+		RecentItems[0] = RecentItems[1]
+		RecentItems[1] = RecentItems[2]
+		RecentItems[2] = None
+
+		Debug.Notification("0: " + RecentItems[0].GetName() + " | " + "1: " + RecentItems[1].GetName() + " | " + "2: " + RecentItems[2].GetName())
 	EndIf
 EndEvent

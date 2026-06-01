@@ -1,7 +1,9 @@
+meshes
 MCM
 Root
 ShaderCache
 SKSE
 Source/Scripts/temp
 textures
-meshes
+UnifiedWaterCache
+UWLoadOrder.hash
