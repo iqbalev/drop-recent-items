@@ -1,35 +1,43 @@
 Scriptname DropRecentItemsPlayerQuest extends ReferenceAlias  
 
 Form[] RecentItems
+Int[] ItemCounts
 Int Property DropKey = 45 Auto
 
-String Function GetFormName(Form akForm)
+String Function GetItemNameAndCount(Form akForm, Int count)
 	If !akForm
 		Return "Empty"
 	EndIf
 
-	Return akForm.GetName()
+	Return akForm.GetName() + " (" + count + ")"
 EndFunction
 
 Event OnInit()
 	UnregisterForAllKeys()
 	RegisterForKey(DropKey)
 	RecentItems = new Form[3]
+	ItemCounts = new Int[3]
 EndEvent
 
 Event OnPlayerLoadGame()
 	UnregisterForAllKeys()
 	RegisterForKey(DropKey)
 	RecentItems = new Form[3]
+	ItemCounts = new Int[3]
 EndEvent
 
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 	RecentItems[2] = RecentItems[1]
-	RecentItems[1] = RecentItems[0]
-	RecentItems[0] = akBaseItem
+	ItemCounts[2] = ItemCounts[1]
 
-	Debug.Trace("AFTER ADDED: " + GetFormName(RecentItems[0]) + " - " + GetFormName(RecentItems[1]) + " - " + GetFormName(RecentItems[2]))
-	Debug.Notification("AFTER ADDED: " + GetFormName(RecentItems[0]) + " - " + GetFormName(RecentItems[1]) + " - " + GetFormName(RecentItems[2]))
+	RecentItems[1] = RecentItems[0]
+	ItemCounts[1] = ItemCounts[0]
+	
+	RecentItems[0] = akBaseItem
+	ItemCounts[0] = aiItemCount
+
+	Debug.Notification("ADDED: " + GetItemNameAndCount(RecentItems[0], ItemCounts[0]) + " - " + GetItemNameAndCount(RecentItems[1], ItemCounts[1]) + " - " + GetItemNameAndCount(RecentItems[2], ItemCounts[2]))
+	Debug.Trace("ADDED: " + GetItemNameAndCount(RecentItems[0], ItemCounts[0]) + " - " + GetItemNameAndCount(RecentItems[1], ItemCounts[1]) + " - " + GetItemNameAndCount(RecentItems[2], ItemCounts[2]))
 EndEvent
 
 Event OnKeyDown(Int KeyCode)
@@ -40,13 +48,18 @@ Event OnKeyDown(Int KeyCode)
 			Return
 		EndIf
 
-		Game.GetPlayer().DropObject(RecentItems[0], 1)
+		Game.GetPlayer().DropObject(RecentItems[0], ItemCounts[0])
+
 		RecentItems[0] = RecentItems[1]
+		ItemCounts[0] = ItemCounts[1]
+
 		RecentItems[1] = RecentItems[2]
+		ItemCounts[1] = ItemCounts[2]
+		
 		RecentItems[2] = None
+		ItemCounts[2] = 0
 
-		Debug.Trace("AFTER DROPPED: " + GetFormName(RecentItems[0]) + " - " + GetFormName(RecentItems[1]) + " - " + GetFormName(RecentItems[2]))
-		Debug.Notification("AFTER DROPPED: " + GetFormName(RecentItems[0]) + " - " + GetFormName(RecentItems[1]) + " - " + GetFormName(RecentItems[2]))
-
+		Debug.Notification("DROPPED: " + GetItemNameAndCount(RecentItems[0], ItemCounts[0]) + " - " + GetItemNameAndCount(RecentItems[1], ItemCounts[1]) + " - " + GetItemNameAndCount(RecentItems[2], ItemCounts[2]))
+		Debug.Trace("DROPPED: " + GetItemNameAndCount(RecentItems[0], ItemCounts[0]) + " - " + GetItemNameAndCount(RecentItems[1], ItemCounts[1]) + " - " + GetItemNameAndCount(RecentItems[2], ItemCounts[2]))
 	EndIf
 EndEvent
