@@ -3,6 +3,7 @@ Scriptname DropRecentItemsPlayerQuest extends ReferenceAlias
 Form[] RecentItems
 Int[] ItemCounts
 Int Property DropKey = 45 Auto
+Int Property MaxRecentItems = 3 Auto
 
 String Function GetItemNameAndCount(Form akForm, Int count)
 	If !akForm
@@ -15,15 +16,15 @@ EndFunction
 Event OnInit()
 	UnregisterForAllKeys()
 	RegisterForKey(DropKey)
-	RecentItems = new Form[3]
-	ItemCounts = new Int[3]
+	RecentItems = Utility.CreateFormArray(MaxRecentItems)
+	ItemCounts = Utility.CreateIntArray(MaxRecentItems)
 EndEvent
 
 Event OnPlayerLoadGame()
 	UnregisterForAllKeys()
 	RegisterForKey(DropKey)
-	RecentItems = new Form[3]
-	ItemCounts = new Int[3]
+	RecentItems = Utility.CreateFormArray(MaxRecentItems)
+	ItemCounts = Utility.CreateIntArray(MaxRecentItems)
 EndEvent
 
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)

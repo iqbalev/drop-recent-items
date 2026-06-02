@@ -1,9 +1,2 @@
-meshes
-MCM
-Root
-ShaderCache
-SKSE
-Source/Scripts/temp
-textures
-UnifiedWaterCache
-UWLoadOrder.hash
+Meta.ini
+TODOs.md
