@@ -1,16 +1,22 @@
 Scriptname DropRecentItemsPlayerQuest extends ReferenceAlias  
 
+int Property DropKey = 45 Auto
+int Property MaxRecentItems = 3 Auto
 Form[] RecentItems
-Int[] ItemCounts
-Int Property DropKey = 45 Auto
-Int Property MaxRecentItems = 3 Auto
+int[] ItemCounts
 
-String Function GetItemNameAndCount(Form akForm, Int count)
-	If !akForm
-		Return "Empty"
-	EndIf
-
-	Return akForm.GetName() + " (" + count + ")"
+string Function GetRecentItemsList(Form[] akForms, int[] aiItemCounts)
+	string recentItemsList = ""
+	int index = 0
+	While index < akForms.Length
+		If akForms[index]
+			recentItemsList += "- " + akForms[index].GetName() + " (" + aiItemCounts[index] + ")" + "\n"
+		Else
+			recentItemsList += "- None" + "\n"
+		EndIf
+	index += 1
+	EndWhile
+	return recentItemsList
 EndFunction
 
 Event OnInit()
@@ -28,39 +34,36 @@ Event OnPlayerLoadGame()
 EndEvent
 
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-	RecentItems[2] = RecentItems[1]
-	ItemCounts[2] = ItemCounts[1]
-
-	RecentItems[1] = RecentItems[0]
-	ItemCounts[1] = ItemCounts[0]
-	
+	int index = RecentItems.Length - 1
+	While index > 0
+		RecentItems[index] = RecentItems[index - 1]
+		ItemCounts[index] = ItemCounts[index - 1]
+		index -= 1
+	EndWhile
 	RecentItems[0] = akBaseItem
 	ItemCounts[0] = aiItemCount
-
-	Debug.Notification("ADDED: " + GetItemNameAndCount(RecentItems[0], ItemCounts[0]) + " - " + GetItemNameAndCount(RecentItems[1], ItemCounts[1]) + " - " + GetItemNameAndCount(RecentItems[2], ItemCounts[2]))
-	Debug.Trace("ADDED: " + GetItemNameAndCount(RecentItems[0], ItemCounts[0]) + " - " + GetItemNameAndCount(RecentItems[1], ItemCounts[1]) + " - " + GetItemNameAndCount(RecentItems[2], ItemCounts[2]))
+	Debug.Trace("RECENT ITEMS LIST" + "\n" + GetRecentItemsList(RecentItems, ItemCounts))
+	Debug.MessageBox("RECENT ITEMS LIST" + "\n" + GetRecentItemsList(RecentItems, ItemCounts))
 EndEvent
 
-Event OnKeyDown(Int KeyCode)
+Event OnKeyDown(int KeyCode)
 	If !Utility.IsInMenuMode() && KeyCode == DropKey
 		If RecentItems[0] == None
 			Debug.Trace("No recent items found")
-			Debug.Notification("No recent items found")
-			Return
+			Debug.MessageBox("No recent items found")
+			return
 		EndIf
-
 		Game.GetPlayer().DropObject(RecentItems[0], ItemCounts[0])
-
-		RecentItems[0] = RecentItems[1]
-		ItemCounts[0] = ItemCounts[1]
-
-		RecentItems[1] = RecentItems[2]
-		ItemCounts[1] = ItemCounts[2]
-		
-		RecentItems[2] = None
-		ItemCounts[2] = 0
-
-		Debug.Notification("DROPPED: " + GetItemNameAndCount(RecentItems[0], ItemCounts[0]) + " - " + GetItemNameAndCount(RecentItems[1], ItemCounts[1]) + " - " + GetItemNameAndCount(RecentItems[2], ItemCounts[2]))
-		Debug.Trace("DROPPED: " + GetItemNameAndCount(RecentItems[0], ItemCounts[0]) + " - " + GetItemNameAndCount(RecentItems[1], ItemCounts[1]) + " - " + GetItemNameAndCount(RecentItems[2], ItemCounts[2]))
+		int index = 0
+		int lastIndex = RecentItems.Length - 1
+		While index < lastIndex
+			RecentItems[index] = RecentItems[index + 1]
+			ItemCounts[index] = ItemCounts[index + 1]
+			index += 1
+		EndWhile
+		RecentItems[lastIndex] = None
+		ItemCounts[lastIndex] = 0
+		Debug.Trace("RECENT ITEMS LIST" + "\n" + GetRecentItemsList(RecentItems, ItemCounts))
+		Debug.MessageBox("RECENT ITEMS LIST" + "\n" + GetRecentItemsList(RecentItems, ItemCounts))
 	EndIf
 EndEvent
