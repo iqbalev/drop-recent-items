@@ -47,7 +47,7 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
 EndEvent
 
 Event OnKeyDown(int KeyCode)
-	If !Utility.IsInMenuMode() && KeyCode == DropKey
+	If KeyCode == DropKey && !Utility.IsInMenuMode() && !UI.IsMenuOpen("Dialogue Menu")
 		If RecentItems[0] == None
 			Debug.Trace("No recent items found")
 			Debug.MessageBox("No recent items found")
