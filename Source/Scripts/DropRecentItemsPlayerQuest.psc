@@ -1,5 +1,7 @@
 Scriptname DropRecentItemsPlayerQuest extends ReferenceAlias  
 
+import PO3_SKSEFunctions
+
 int Property DropKey = 45 Auto
 int Property MaxRecentItems = 3 Auto
 Form[] RecentItems
@@ -34,6 +36,16 @@ Event OnPlayerLoadGame()
 EndEvent
 
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
+	If akItemReference && IsQuestItem(akItemReference)
+		Debug.Trace("Quest item is excluded from recent items")
+		Debug.Notification("Quest item is excluded from recent items")
+		return
+	EndIf
+	If akBaseItem.getName() == ""
+		Debug.Trace("Nameless item is excluded from recent items")
+		Debug.Notification("Nameless item is excluded from recent items")
+		return
+	EndIf
 	int index = RecentItems.Length - 1
 	While index > 0
 		RecentItems[index] = RecentItems[index - 1]
@@ -50,7 +62,7 @@ Event OnKeyDown(int KeyCode)
 	If KeyCode == DropKey && !Utility.IsInMenuMode() && !UI.IsMenuOpen("Dialogue Menu")
 		If RecentItems[0] == None
 			Debug.Trace("No recent items found")
-			Debug.MessageBox("No recent items found")
+			Debug.Notification("No recent items found")
 			return
 		EndIf
 		Game.GetPlayer().DropObject(RecentItems[0], ItemCounts[0])
