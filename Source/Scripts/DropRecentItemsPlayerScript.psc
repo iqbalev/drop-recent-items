@@ -1,4 +1,4 @@
-Scriptname DropRecentItemsPlayerQuest extends ReferenceAlias  
+Scriptname DropRecentItemsPlayerScript extends ReferenceAlias  
 
 import PO3_SKSEFunctions
 
