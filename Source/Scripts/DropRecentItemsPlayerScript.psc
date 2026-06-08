@@ -2,19 +2,21 @@ Scriptname DropRecentItemsPlayerScript extends ReferenceAlias
 
 import PO3_SKSEFunctions
 
-int Property DropKey = 45 Auto
+FormList Property DropRecentItemsExclusionList Auto
+int Property DropKeyCode = 45 Auto
 int Property MaxRecentItems = 3 Auto
 Form[] RecentItems
 int[] ItemCounts
 
+
 string Function GetRecentItemsList(Form[] akForms, int[] aiItemCounts)
-	string recentItemsList = ""
+	string recentItemsList = "RECENT ITEMS LIST" + "\n"
 	int index = 0
 	While index < akForms.Length
 		If akForms[index]
-			recentItemsList += "- " + akForms[index].GetName() + " (" + aiItemCounts[index] + ")" + "\n"
+			recentItemsList += (index + 1) + ". " + akForms[index].GetName() + " (" + aiItemCounts[index] + ")" + "\n"
 		Else
-			recentItemsList += "- None" + "\n"
+			recentItemsList += (index + 1) + ". None" + "\n"
 		EndIf
 	index += 1
 	EndWhile
@@ -23,27 +25,22 @@ EndFunction
 
 Event OnInit()
 	UnregisterForAllKeys()
-	RegisterForKey(DropKey)
+	RegisterForKey(DropKeyCode)
 	RecentItems = Utility.CreateFormArray(MaxRecentItems)
 	ItemCounts = Utility.CreateIntArray(MaxRecentItems)
 EndEvent
 
 Event OnPlayerLoadGame()
 	UnregisterForAllKeys()
-	RegisterForKey(DropKey)
+	RegisterForKey(DropKeyCode)
 	RecentItems = Utility.CreateFormArray(MaxRecentItems)
 	ItemCounts = Utility.CreateIntArray(MaxRecentItems)
 EndEvent
 
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-	If akItemReference && IsQuestItem(akItemReference)
-		Debug.Trace("Quest item is excluded from recent items")
-		Debug.Notification("Quest item is excluded from recent items")
-		return
-	EndIf
-	If akBaseItem.getName() == ""
-		Debug.Trace("Nameless item is excluded from recent items")
-		Debug.Notification("Nameless item is excluded from recent items")
+	If DropRecentItemsExclusionList.HasForm(akBaseItem) || (akItemReference && IsQuestItem(akItemReference)) || akBaseItem.getName() == "" 
+		Debug.Trace("This item is excluded from recent items")
+		Debug.Notification("This item is excluded from recent items")
 		return
 	EndIf
 	int index = RecentItems.Length - 1
@@ -54,15 +51,15 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
 	EndWhile
 	RecentItems[0] = akBaseItem
 	ItemCounts[0] = aiItemCount
-	Debug.Trace("RECENT ITEMS LIST" + "\n" + GetRecentItemsList(RecentItems, ItemCounts))
-	Debug.MessageBox("RECENT ITEMS LIST" + "\n" + GetRecentItemsList(RecentItems, ItemCounts))
+	Debug.Trace(GetRecentItemsList(RecentItems, ItemCounts))
+	MiscUtil.PrintConsole(GetRecentItemsList(RecentItems, ItemCounts))
 EndEvent
 
 Event OnKeyDown(int KeyCode)
-	If KeyCode == DropKey && !Utility.IsInMenuMode() && !UI.IsMenuOpen("Dialogue Menu")
+	If KeyCode == DropKeyCode && !Utility.IsInMenuMode() && !UI.IsMenuOpen("Dialogue Menu")
 		If RecentItems[0] == None
-			Debug.Trace("No recent items found")
-			Debug.Notification("No recent items found")
+			Debug.Trace("There are no recent items")
+			Debug.Notification("There are no recent items")
 			return
 		EndIf
 		Game.GetPlayer().DropObject(RecentItems[0], ItemCounts[0])
@@ -75,7 +72,7 @@ Event OnKeyDown(int KeyCode)
 		EndWhile
 		RecentItems[lastIndex] = None
 		ItemCounts[lastIndex] = 0
-		Debug.Trace("RECENT ITEMS LIST" + "\n" + GetRecentItemsList(RecentItems, ItemCounts))
-		Debug.MessageBox("RECENT ITEMS LIST" + "\n" + GetRecentItemsList(RecentItems, ItemCounts))
+		Debug.Trace(GetRecentItemsList(RecentItems, ItemCounts))
+		MiscUtil.PrintConsole(GetRecentItemsList(RecentItems, ItemCounts))
 	EndIf
 EndEvent
